@@ -1,0 +1,43 @@
+#This is .gitignore example for C++. Basically you use glob pattern (simplified regular expression) to indicate what kind of files to be ignored.
+# *.[oa] means all files with extension .o or .a
+# *~ means all files have name end with tilde
+# *.a means no .a files
+# !lib.a means do track lib.a, even though you're ignoring .a files above
+# /TODO means only ignore the root TODO file, not subdir/TODO
+# build/ means ignore all files in the build/ directory
+# doc/*.txt means ignore all txt file right under doc directory
+# doc/**/*.txt means ignore all .txt files in the doc/ directory
+
+ 
+#from https://github.com/github/gitignore
+#Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+#Precompiled Headers
+*.gch
+*.pch
+
+
+#Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+
+#Fortran module files
+*.mod
+
+#Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+
+#Executables
+*.exe
+*.out
+*.app
