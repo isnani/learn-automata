@@ -359,21 +359,39 @@ class Dfa(object):
             return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
         else:
             temp = set([])
-            for tup in unmarked:
-                temp.add(tup[0])
-                temp.add(tup[1])
+            unmarked_copy = unmarked.copy()
+            for tup in unmarked: #unmarked might contain more than one edges
+                unmarked_copy.discard(tup)
+                for tup2 in unmarked_copy:
+                    if tup2[0] in tup:
+                        if tup2[1] in tup:
+                            temp.add(tup)
+                        else:
+                            temp.add(tup + tup2[1])
+                    else:
+                        if tup2[1] in tup:
+                            temp.add(tup + tup2[0])
+                        else:
+                            temp.add(tup) #may be true
+
+                        
             if new_start in temp:
                 new_start = new_start+"*"
             if new_final.intersection(temp) != set([]):
                 temp2 = new_final.intersection(temp)
                 new_final.difference_update(temp2)
                 new_final_state = temp2.pop()+"*"
-                print type(new_final_state)
                 new_final.add(new_final_state)
                 new_states = new_states.difference(temp2)
             new_states = new_states.difference(temp)
             new_states.add(new_start)
             new_states = new_states.union(new_final)
+
+            #next: new delta
+            new_delta_copy = new_delta.copy()
+            for tup in new_delta_copy:
+                if tup[0] or tup[2] in temp:
+                    pass
             return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
 
