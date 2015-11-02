@@ -134,7 +134,7 @@ class Dfa(object):
         final = set([])
         start = (a1.start, a2.start)
         delta = set([])
-        worklist = set((start,)) ##interesting here is how to initialize set of tuples with one member (a single tuple). be careful! 
+        worklist = set((start,)) ##interesting here is how to initialize a set of tuples with one member (a single tuple). be careful! 
         while worklist != set([]):
             pick = worklist.pop()
             states.add(pick)
