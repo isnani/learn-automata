@@ -8,7 +8,7 @@ Collection of automata-related algorithms for student, including:
     - NFA
     - NFA-e
     
-2. Converting
+2. Convertion
     - NFA-e to NFA
     - NFA to DFA
     
@@ -16,7 +16,7 @@ Collection of automata-related algorithms for student, including:
     - Universality
     - Emptiness
     
-4. Operating 2 automata
+4. Operation on two automata
     - Complement
     - Union
     - Intersection
@@ -27,4 +27,7 @@ Collection of automata-related algorithms for student, including:
     - Moore algorithm
     - Brzozowski algorithm
 
+The aim is to visualize every step the algorithm use to get the result.
+
+Collaboration is welcome!
 
