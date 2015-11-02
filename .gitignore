@@ -44,3 +44,6 @@
 
 #being edited
 *.~
+
+#compiled python file
+*.pyc
