@@ -76,7 +76,7 @@ class Nfa(object):
 
         # helping variables
         is_in_final = False
-        is_not_existed = False
+        is_existed = False
         new_state = ''
         state_to_states = {}  # to store a name of compound state and the states arrange it
         new_state_consists_of = set([])
@@ -107,9 +107,9 @@ class Nfa(object):
                 # Hence, we need to ensure that new_state_consists_of doesn't exist in new_states
                 for key in state_to_states:
                     if state_to_states[key] == new_state_consists_of:
-                        is_not_existed = False
+                        is_existed = True
 
-                if is_not_existed:
+                if not is_existed:
                     for state in new_state_consists_of:
                         # if one of the states in NFA's set of states, then they will be added as a final state in DFA
                         if state in self.final:
@@ -128,9 +128,11 @@ class Nfa(object):
 
                     # finally, add new_state to working_list and remove the state that has just been proceeded
                     working_list.add(new_state)
-                    is_not_existed = False
-                    new_state = ''
+
+                is_existed = False
+                new_state = ''
+                new_state_consists_of = set([])
 
             working_list.discard(current_state)
-
+            
         return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
