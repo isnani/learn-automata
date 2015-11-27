@@ -27,7 +27,7 @@ Collection of automata-related algorithms for student, including:
     - Moore algorithm
     - Brzozowski algorithm
 
-The aim is to visualize every step the algorithm use to get the result.
+The aim is to visualize every step the algorithms use to reach goal.
 
 Collaboration is welcome!
 

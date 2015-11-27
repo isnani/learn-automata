@@ -1,7 +1,8 @@
 # Deterministic Finite Automata
 
 class Dfa(object):
-    
+
+
     def __init__(self, states, alphabet, delta, start, final):
         # states, alphabet, final are set.
         # delta is set of tuple
@@ -92,7 +93,7 @@ class Dfa(object):
                 return False
             else:
                 current_state = next_state
-                symbol+=1
+                symbol += 1
         else:
             for q in self.final:
                 if current_state == q:
@@ -106,6 +107,7 @@ class Dfa(object):
         '''
         by definition somewhere, the complement of dfa can be obtained by changing all its non final states to
         final states and vice versa
+        :rtype : Dfa
         '''
         
         final = self.states.difference(self.final)
@@ -117,13 +119,16 @@ class Dfa(object):
     def union(self, automata):
         return self.__bin_op(self, automata, 'or')
 
-    def symdifference(self, automata):
+    def set_difference(self, automata):
+        return self.__bin_op(self, automata, 'min')
+
+    def sym_difference(self, automata):
         return self.__bin_op(self, automata, 'xor')
 
     def __bin_op(self, a1, a2, op):
         '''
-        this function is used by union, intersection and symmetric different operations. That because they differ only on
-        how to determine the final states.
+        this function is used by union, intersection, difference, and symmetric different operations. That because they
+        differ only on how to determine the final states.
         '''
         
         alphabet = a1.alphabet.copy()
@@ -141,6 +146,9 @@ class Dfa(object):
                     final.add(pick)
             elif op == 'or':
                 if pick[0] in a1.final or pick[1] in a2.final:
+                    final.add(pick)
+            elif op == 'min':
+                if pick[0] in a1.final and pick[1] not in a2.final:
                     final.add(pick)
             elif op == 'xor':
                 if (pick[0] in a1.final and pick[1] not in a2.final) or (pick[0] not in a1.final and pick[1] in a2.final):
@@ -185,6 +193,14 @@ class Dfa(object):
                     continue
             else:
                 return True
+
+    # TODO
+    def is_included(self, automata):
+        pass
+
+    # TODO
+    def is_equal(self, automata):
+        pass
 
     def is_reachable(self, state):
         '''
@@ -411,4 +427,5 @@ class Dfa(object):
                 regex += tup[1]
 
 
-    
+    def __sort_by(self):
+        pass

@@ -53,6 +53,7 @@ class Nfa(object):
         :return:boolean
         '''
 
+        # TODO: find a way to backtrack
         current_state = self.start
         for symbol in range(0, len(word)):
             next_states = self.delta_function(current_state, word[symbol])
@@ -67,6 +68,7 @@ class Nfa(object):
         :return:Dfa
         '''
 
+        # TODO: think about the possibility that a state may go to 's'
         # initialize the components of DFA
         new_start = self.start
         new_alphabet = self.alphabet
@@ -134,5 +136,36 @@ class Nfa(object):
                 new_state_consists_of = set([])
 
             working_list.discard(current_state)
-            
+
         return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
+
+    def complement(self):
+
+        '''
+        To obtain the complement of this NFA i.e NFA that accepts languages not in L(NFA). Tha strategy is to convert
+        this NFA to DFA first, then swap its final and non final states
+        :return : Dfa
+        '''
+
+        return Dfa.complement(self.convert_to_dfa())
+
+    def union(self):
+        pass
+
+    def intersection(self):
+        pass
+
+    def symdifference(self):
+        pass
+
+    def is_empty(self):
+        pass
+
+    def is_universal(self):
+        pass
+
+    def is_included(self):
+        pass
+
+    def is_equal(self):
+        pass
