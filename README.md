@@ -15,11 +15,14 @@ Collection of automata-related algorithms for student, including:
 3. Checking properties
     - Universality
     - Emptiness
+    - Inclusion
+    - Equality
     
 4. Operation on two automata
     - Complement
     - Union
     - Intersection
+    - Difference
     - Symmetric Difference
 
 5. Minimizing
