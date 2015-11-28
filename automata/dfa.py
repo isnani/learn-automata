@@ -2,12 +2,14 @@
 
 class Dfa(object):
 
-
     def __init__(self, states, alphabet, delta, start, final):
-        # states, alphabet, final are set.
-        # delta is set of tuple
-        # start is string
-
+        """
+        :type states: set
+        :type alphabet: set
+        :type delta: set of tuple
+        :type start: str
+        :type final: set
+        """
         self.states = states
         self.alphabet = alphabet
         self.delta = delta
@@ -15,15 +17,14 @@ class Dfa(object):
         self.final = final
 
     def is_dfa(self):
-        '''
+        """
         by definition somewhere, dfa is characterized by its transition function, where each state only has outcoming
         transition reading exactly one of every symbol in alphabet. Even the transition goes to dead state.
         Considering that dead state doesn't necessarily appear.
-        '''
-        # later this function should be set to private, and is used to ensure validity of the instance of this class
+        :rtype: bool
+        """
+        # later this function should be set to private, and is used to ensure validity of the instance of this class?
 
-        count = 0
-        num_symbols = len(self.alphabet)
         set_symbols = set([])
         for state in self.states:
             for trans in self.delta:
@@ -37,9 +38,9 @@ class Dfa(object):
             return True
 
     def print_out(self):
-        '''
+        """
         to display the component of automata   
-        '''
+        """
         
         print "States = ",
         for q in self.states:
@@ -69,9 +70,12 @@ class Dfa(object):
             print ")"
 
     def delta_function(self, state, symbol):
-        '''
+        """
         what state is now when you are from a state and reading a symbol.
-        '''
+        :param state: str
+        :param symbol: str
+        :rtype: str
+        """
         
         for d in self.delta:
             if d[0] == state and d[1] == symbol:
@@ -81,10 +85,12 @@ class Dfa(object):
 
 
     def is_accepted(self, word):
-        '''
+        """
         to check whether a given word is recognized (accepted) by the language or not. Recognized means
         the word is a member of language formed by the automata
-        '''
+        :param word: str
+        :rtype: bool
+        """
         
         current_state = self.start
         for symbol in range(0,len(word)):
@@ -104,32 +110,56 @@ class Dfa(object):
 
 
     def complement(self):
-        '''
+        """
         by definition somewhere, the complement of dfa can be obtained by changing all its non final states to
         final states and vice versa
-        :rtype : Dfa
-        '''
+        :rtype: Dfa
+        """
         
         final = self.states.difference(self.final)
         return Dfa(self.states, self.alphabet, self.delta, self.start, final)
         
     def intersection(self, automata):
+        """
+
+        :param automata: Dfa
+        :rtype: Dfa
+        """
         return self.__bin_op(self, automata, 'and')
 
     def union(self, automata):
+        """
+
+        :param automata: Dfa
+        :rtype: Dfa
+        """
         return self.__bin_op(self, automata, 'or')
 
     def set_difference(self, automata):
+        """
+
+        :param automata: Dfa
+        :rtype: Dfa
+        """
         return self.__bin_op(self, automata, 'min')
 
     def sym_difference(self, automata):
+        """
+
+        :param automata: Dfa
+        :rtype: Dfa
+        """
         return self.__bin_op(self, automata, 'xor')
 
     def __bin_op(self, a1, a2, op):
-        '''
+        """
         this function is used by union, intersection, difference, and symmetric different operations. That because they
         differ only on how to determine the final states.
-        '''
+        :param a1: Dfa
+        :param a2: Dfa
+        :param op: str
+        :rtype: Dfa
+        """
         
         alphabet = a1.alphabet.copy()
         states = set([])
@@ -163,10 +193,11 @@ class Dfa(object):
         return Dfa(states, alphabet, delta, start, final)
 
     def is_universal(self):
-        '''
+        """
         dfa is universal if all states are final state, excluding unreachable states. as for dead state?? should be yes!
         then it need to check if dfa has 'complete' transition.
-        '''
+        :rtype: bool
+        """
         
         reachable = set([])
         for state in self.states:
@@ -178,10 +209,11 @@ class Dfa(object):
             return False
 
     def is_empty(self):
-        '''
+        """
         dfa is empty if there is no final state, excluding unreachable states.
         doesn't need to check the dead state. the dead state doesn't appear means it is not a final state.
-        '''
+        :rtype: bool
+        """
         
         if self.final == set([]):
             return True
@@ -196,17 +228,28 @@ class Dfa(object):
 
     # TODO
     def is_included(self, automata):
+        """
+
+        :param automata: Dfa
+        :rtype: bool
+        """
         pass
 
     # TODO
     def is_equal(self, automata):
+        """
+
+        :param automata: Dfa
+        :rtype: bool
+        """
         pass
 
     def is_reachable(self, state):
-        '''
+        """
         reachable state means that such state can be reached from start state by running some transition
-        '''
-        
+        :param state: str
+        :rtype: bool
+        """
         working_list = set([state])
         # print working list
         if state == self.start:
@@ -231,9 +274,10 @@ class Dfa(object):
                     return True
 
     def minimize_by_hopcroft(self):
-        '''
-        Hopcroft algorithm to minimize dfa
-        '''
+        """
+        Hopcroft algorithm to minimize this DFA
+        :rtype: Dfa
+        """
         
         final = self.final
         not_final = self.states.difference(self.final)
@@ -321,10 +365,13 @@ class Dfa(object):
         return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
     def __split(self, splitter, partition):
-        '''
+        """
         this function is used by hopcroft algorithm, that is introducing the function to split partition,
         given both set of states and symbol incoming to them.
-        '''
+        :param splitter: str
+        :param partition: set
+        :rtype: tuple
+        """
         
         split_state = ()  # tuple
         for apart in partition:  # apart is tuple, partition is set
@@ -333,11 +380,12 @@ class Dfa(object):
 
     
     def minimize_by_moore(self):
-        '''
+        """
         the idea is using complete graph (states as nodes) as starting step. Then mark all edges between final and
         non-final nodes. As long as there exist marked edges, repeat the following step. Choose (arbitrarily) a marked
         edge (p',q'). Mark all unmarked edges (p,q) where (p.a, q.a) = (p',q') for some a in alphabet.
-        '''
+        :rtype: Dfa
+        """
         complete_graph = set([])
         states = self.states.copy()
         while states != set([]):
@@ -410,13 +458,18 @@ class Dfa(object):
             return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
     def minimize_by_brzozowski(self):
+        """
+
+        :rtype: Dfa
+        """
         pass
         
     def convert_to_regex(self):
-        '''
+        """
         our regular expression will only need symbols in alphabet, operator +, *,concatenation that has no shape,
         and parentheses to against priority.(* > . > +)
-        '''
+        :rtype: str
+        """
 
         regex = ''
         working_list = set([])
@@ -426,6 +479,3 @@ class Dfa(object):
             else:
                 regex += tup[1]
 
-
-    def __sort_by(self):
-        pass

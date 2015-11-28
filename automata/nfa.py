@@ -1,12 +1,17 @@
 from types import *
-from dfa import Dfa
+
+from automata.dfa import Dfa
 
 
 class Nfa(object):
     def __init__(self, states, alphabet, delta, start, final):
-        # states, alphabet, final are set of string.
-        # delta is set of tuple
-        # start is string
+        """
+        :type states: set
+        :type alphabet: set
+        :type delta: set of tuple
+        :type start: str
+        :type final: set
+        """
         assert type(states) is set, "%r is not a set" % states
         assert type(alphabet) is set, "%r is not a set" % alphabet
         assert type(delta) is set, "%r is not a set" % delta
@@ -20,13 +25,11 @@ class Nfa(object):
         self.final = final
 
     def is_nfa(self):
-        '''
+        """
         To check whether the instance is a correct NFA
-        :return: boolean
-        '''
-        # assert isinstance(self.delta, set), "%r is not a set" % self.delta
-        # delta_function = self.delta.copy()
-        # noinspection PyCallByClass
+        :rtype: bool
+        """
+
         d = Dfa(self.states, self.alphabet, self.delta, self.start, self.final)
         if not (d.is_dfa()):
             return True
@@ -34,7 +37,12 @@ class Nfa(object):
             return False
 
     def delta_function(self, state, symbol):
-        '''What states are now when you are from a state and reading a symbol.'''
+        """
+        What states are now when you are from a state and reading a symbol
+        :param state: str
+        :param symbol: str
+        :rtype: set
+        """
 
         next_states = set([])
         for d in self.delta:
@@ -46,12 +54,11 @@ class Nfa(object):
             return next_states
 
     def is_accepted(self, word):
-
-        '''Return true or false
+        """
         To check whether the given word is recognized by this NFA or not. Unlike those in DFA, NFA may need to backtrack.
-        :param word:string
-        :return:boolean
-        '''
+        :param word: str
+        :rtype: bool
+        """
 
         # TODO: find a way to backtrack
         current_state = self.start
@@ -63,10 +70,10 @@ class Nfa(object):
                     return False
 
     def convert_to_dfa(self):
-        '''
+        """
         convert NFA to DFA, using subset construction
-        :return:Dfa
-        '''
+        :rtype: Dfa
+        """
 
         # TODO: think about the possibility that a state may go to 's'
         # initialize the components of DFA
@@ -140,12 +147,11 @@ class Nfa(object):
         return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
     def complement(self):
-
-        '''
+        """
         To obtain the complement of this NFA i.e NFA that accepts languages not in L(NFA). Tha strategy is to convert
         this NFA to DFA first, then swap its final and non final states
-        :return : Dfa
-        '''
+        :rtype : Dfa
+        """
 
         return Dfa.complement(self.convert_to_dfa())
 
