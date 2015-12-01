@@ -160,36 +160,47 @@ class Dfa(object):
         :param op: str
         :rtype: Dfa
         """
+
+        # helping variable, to join compound state
+        str = ""
         
         alphabet = a1.alphabet.copy()
         states = set([])
         final = set([])
-        start = (a1.start, a2.start)
+        new_start_consists_of = (a1.start, a2.start)  # new start state is join of both automata's start state
+        start = str.join(new_start_consists_of)
         delta = set([])
-        working_list = set((start,))
+        working_list = set((new_start_consists_of,))
         # interesting above is how to initialize a set of tuples with one member (a single tuple). be careful!
         while working_list != set([]):
             pick = working_list.pop()
-            states.add(pick)
+
+            # add current pick as a single string to new set of states
+            states.add(str.join(pick))
+
+            # depending on the operation, a new final state is chosen here
             if op == 'and':
                 if pick[0] in a1.final and pick[1] in a2.final:
-                    final.add(pick)
+                    final.add(str.join(pick))
             elif op == 'or':
                 if pick[0] in a1.final or pick[1] in a2.final:
-                    final.add(pick)
+                    final.add(str.join(pick))
             elif op == 'min':
                 if pick[0] in a1.final and pick[1] not in a2.final:
-                    final.add(pick)
+                    final.add(str.join(pick))
             elif op == 'xor':
                 if (pick[0] in a1.final and pick[1] not in a2.final) or (pick[0] not in a1.final and pick[1] in a2.final):
-                    final.add(pick)
+                    final.add(str.join(pick))
 
+            # completing the transition function for each new state
             for symbol in alphabet:
                 q1 = a1.delta_function(pick[0], symbol)
                 q2 = a2.delta_function(pick[1], symbol)
-                if (q1,q2) not in states:
-                    working_list.add((q1,q2))
-                delta.add((pick, symbol, (q1,q2)))
+                new_state_consists_of = (q1,q2)
+                if str.join(new_state_consists_of) not in states:
+                    working_list.add(new_state_consists_of)
+                delta.add((str.join(pick), symbol, str.join(new_state_consists_of)))
+
         return Dfa(states, alphabet, delta, start, final)
 
     def is_universal(self):
