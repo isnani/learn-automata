@@ -104,7 +104,6 @@ class Dfa(object):
             for q in self.final:
                 if current_state == q:
                     return True
-                    break
             else:
                 return False
 
@@ -151,6 +150,7 @@ class Dfa(object):
         """
         return self.__bin_op(self, automata, 'xor')
 
+    # TODO: concat compound state , ('1', '1') becomes '11'
     def __bin_op(self, a1, a2, op):
         """
         this function is used by union, intersection, difference, and symmetric different operations. That because they
@@ -457,25 +457,19 @@ class Dfa(object):
                     pass
             return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
+    # TODO
     def minimize_by_brzozowski(self):
         """
 
         :rtype: Dfa
         """
         pass
-        
+
+    # TODO
     def convert_to_regex(self):
         """
         our regular expression will only need symbols in alphabet, operator +, *,concatenation that has no shape,
         and parentheses to against priority.(* > . > +)
         :rtype: str
         """
-
-        regex = ''
-        working_list = set([])
-        for tup in self.delta:
-            if tup[0] == tup[2]:
-                regex += tup[1], '*'
-            else:
-                regex += tup[1]
-
+        pass

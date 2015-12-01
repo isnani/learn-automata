@@ -168,7 +168,12 @@ class Nfa(object):
         pass
 
     def is_universal(self):
-        pass
+        """
+        Converting NFA to DFA is well actually high cost. Though many methods have been proposed out there, but for now
+        checking universality of NFA by converting it to DFA is the best deal here :)
+        :rtype: bool
+        """
+        return Dfa.is_universal(self.convert_to_dfa())
 
     def is_included(self):
         pass
