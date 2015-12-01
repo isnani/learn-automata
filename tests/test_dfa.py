@@ -10,6 +10,9 @@ class DfaCase(unittest.TestCase):
     d2 = Dfa({'1', '2', '3'}, {'a', 'b'}, {('1', 'a', '1'), ('1', 'b', '2'), ('2', 'a', '3'),\
                                            ('3', 'b', '1')}, '1', {'3'})
     d3 = Dfa({'1', '2', '3'}, {'a', 'b'}, {('1', 'a', '2'), ('2', 'b', '3')}, '1', {'1', '2'})
+    d4 = Dfa({'1', '2', '3', '4', '5'}, {'a', 'b'}, {('1', 'a', '5'), ('1', 'b', '2'), ('2', 'a', '3'), ('2', 'b', '5'),
+                                                     ('3', 'a', '3'), ('3', 'b', '4'), ('4', 'a', '3'), ('4', 'b', '5'),
+                                                     ('5', 'a', '5'), ('5', 'b', '5')}, '1', {'2', '3', '4'})
 
     def test_is_dfa_d1(self):
         self.assertTrue(self.d1.is_dfa(), True)
@@ -95,7 +98,20 @@ class DfaCase(unittest.TestCase):
         pass
 
     def test_minimize_by_hopcroft_d1(self):
-        pass
+        self.assertSetEqual(self.d1.minimize_by_hopcroft().states, {'1', '2', '3'})
+        self.assertSetEqual(self.d1.minimize_by_hopcroft().alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d1.minimize_by_hopcroft().delta, {('1', 'a', '2'), ('2', 'b', '3')})
+        self.assertEqual(self.d1.minimize_by_hopcroft().start, '1')
+        self.assertSetEqual(self.d1.minimize_by_hopcroft().final, {'3'})
+
+    def test_minimize_by_hopcroft_d4(self):
+        self.assertSetEqual(self.d4.minimize_by_hopcroft().states, {'1', '24', '3', '5'})
+        self.assertSetEqual(self.d4.minimize_by_hopcroft().alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d4.minimize_by_hopcroft().delta, {('1', 'a', '5'), ('1', 'b', '24'), ('24', 'a', '3'),
+                                                                   ('24', 'b', '5'), ('3', 'a', '3'), ('3', 'b', '24'),
+                                                                   ('5', 'a', '5'), ('5', 'b', '5')})
+        self.assertEqual(self.d4.minimize_by_hopcroft().start, '1')
+        self.assertSetEqual(self.d4.minimize_by_hopcroft().final, {'24', '3'})
 
     def test_minimize_by_moore_d1(self):
         pass
