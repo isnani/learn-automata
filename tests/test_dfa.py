@@ -40,7 +40,8 @@ class DfaCase(unittest.TestCase):
         self.assertSetEqual(self.d1.intersection(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
         self.assertSetEqual(self.d1.intersection(self.d2).alphabet, {'a', 'b'})
         self.assertSetEqual(self.d1.intersection(self.d2).delta,
-                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's3'), ('21', 'b', '32'),
+
+                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's1'), ('21', 'b', '32'),
                              ('s3', 'a', 'ss'), ('s3', 'b', 's1'), ('32', 'a', 's3'), ('32', 'b', 'ss'),
                              ('ss', 'a', 'ss'), ('ss', 'b', 'ss'), ('s1', 'a', 's1'), ('s1', 'b', 's2'),
                              ('s2', 'a', 's3'), ('s2', 'b', 'ss')})
@@ -48,37 +49,38 @@ class DfaCase(unittest.TestCase):
         self.assertSetEqual(self.d1.intersection(self.d2).final, set([]))
 
     def test_union_d1_d2(self):
-        self.assertSetEqual(self.d1.intersection(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
-        self.assertSetEqual(self.d1.intersection(self.d2).alphabet, {'a', 'b'})
-        self.assertSetEqual(self.d1.intersection(self.d2).delta,
-                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's3'), ('21', 'b', '32'),
+
+        self.assertSetEqual(self.d1.union(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
+        self.assertSetEqual(self.d1.union(self.d2).alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d1.union(self.d2).delta,
+                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's1'), ('21', 'b', '32'),
                              ('s3', 'a', 'ss'), ('s3', 'b', 's1'), ('32', 'a', 's3'), ('32', 'b', 'ss'),
                              ('ss', 'a', 'ss'), ('ss', 'b', 'ss'), ('s1', 'a', 's1'), ('s1', 'b', 's2'),
                              ('s2', 'a', 's3'), ('s2', 'b', 'ss')})
-        self.assertEqual(self.d1.intersection(self.d2).start, '11')
-        self.assertSetEqual(self.d1.intersection(self.d2).final, {'s3', '32'})
+        self.assertEqual(self.d1.union(self.d2).start, '11')
+        self.assertSetEqual(self.d1.union(self.d2).final, {'s3', '32'})
 
     def test_set_difference_d1_d2(self):
-        self.assertSetEqual(self.d1.intersection(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
-        self.assertSetEqual(self.d1.intersection(self.d2).alphabet, {'a', 'b'})
-        self.assertSetEqual(self.d1.intersection(self.d2).delta,
-                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's3'), ('21', 'b', '32'),
+        self.assertSetEqual(self.d1.set_difference(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
+        self.assertSetEqual(self.d1.set_difference(self.d2).alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d1.set_difference(self.d2).delta,
+                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's1'), ('21', 'b', '32'),
                              ('s3', 'a', 'ss'), ('s3', 'b', 's1'), ('32', 'a', 's3'), ('32', 'b', 'ss'),
                              ('ss', 'a', 'ss'), ('ss', 'b', 'ss'), ('s1', 'a', 's1'), ('s1', 'b', 's2'),
                              ('s2', 'a', 's3'), ('s2', 'b', 'ss')})
-        self.assertEqual(self.d1.intersection(self.d2).start, '11')
-        self.assertSetEqual(self.d1.intersection(self.d2).final, set([]))
+        self.assertEqual(self.d1.set_difference(self.d2).start, '11')
+        self.assertSetEqual(self.d1.set_difference(self.d2).final, {'32'})
 
     def test_sym_difference_d1_d2(self):
-        self.assertSetEqual(self.d1.intersection(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
-        self.assertSetEqual(self.d1.intersection(self.d2).alphabet, {'a', 'b'})
-        self.assertSetEqual(self.d1.intersection(self.d2).delta,
-                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's3'), ('21', 'b', '32'),
+        self.assertSetEqual(self.d1.sym_difference(self.d2).states, {'11', '21', 's3', 'ss', '32', 's1', 's2'})
+        self.assertSetEqual(self.d1.sym_difference(self.d2).alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d1.sym_difference(self.d2).delta,
+                            {('11', 'a', '21'), ('11', 'b', 's2'), ('21', 'a', 's1'), ('21', 'b', '32'),
                              ('s3', 'a', 'ss'), ('s3', 'b', 's1'), ('32', 'a', 's3'), ('32', 'b', 'ss'),
                              ('ss', 'a', 'ss'), ('ss', 'b', 'ss'), ('s1', 'a', 's1'), ('s1', 'b', 's2'),
                              ('s2', 'a', 's3'), ('s2', 'b', 'ss')})
-        self.assertEqual(self.d1.intersection(self.d2).start, '11')
-        self.assertSetEqual(self.d1.intersection(self.d2).final, set([]))
+        self.assertEqual(self.d1.sym_difference(self.d2).start, '11')
+        self.assertSetEqual(self.d1.sym_difference(self.d2).final, {'32', 's3'})
 
     def test_is_universal_d1(self):
         self.assertFalse(self.d1.is_universal())
