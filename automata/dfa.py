@@ -150,7 +150,6 @@ class Dfa(object):
         """
         return self.__bin_op(self, automata, 'xor')
 
-    # TODO: concat compound state , ('1', '1') becomes '11'
     def __bin_op(self, a1, a2, op):
         """
         this function is used by union, intersection, difference, and symmetric different operations. That because they
@@ -292,25 +291,22 @@ class Dfa(object):
         
         final = self.final
         not_final = self.states.difference(self.final)
-        partition = {tuple(final), tuple(not_final)}  # ->set of tuples, ideally set of sets but it is not allowed
-        # ->initializing working_list
+        partition = {tuple(final), tuple(not_final)}  # set of tuples, ideally set of sets but it is not allowed
+
+        # initializing working_list
         if len(final) <= len(not_final):
-            # ->{((),''),((),''),..} --> use .pop to empty the set
             working_list = set((tuple(final),y) for y in self.alphabet)
-            print "initial working_list= ",working_list
-            
+            # print "initial working_list= ",working_list
         else:
             working_list = set((tuple(not_final),y) for y in self.alphabet)
-            print "initial working_list= ",working_list
-
-        print "----------------------------------------------"
+            # print "initial working_list= ",working_list
 
         while working_list != set([]):
             splitter = working_list.pop()
-            print "partition= ",partition
-            print "splitter= ",splitter
+            # print "partition= ",partition
+            # print "splitter= ",splitter
             split_state = self.__split(splitter, partition)
-            print "split_state =  ", split_state
+            # print "split_state =  ", split_state
             working_list.discard(splitter)  # ->it raised KeyError when using .remove(el)
             
             partition_copy = partition.copy()
@@ -323,16 +319,14 @@ class Dfa(object):
                         one_part += (x,)
 
                 other_part = tuple(x for x in apart if x not in one_part)
-                print "one_part = ", one_part
-                print "other_part = ", other_part
                         
-                # #update partition, if one apart is affected
+                # update partition, if one apart is affected
                 if one_part != () and other_part != ():
                     partition.discard(apart)
                     partition.add(one_part)
                     partition.add(other_part)
 
-                    # #update working_list
+                    # update working_list
                     for symbol in self.alphabet:
                         if (apart, symbol) in working_list:
                             working_list.discard((apart,symbol))
@@ -340,38 +334,36 @@ class Dfa(object):
                             working_list.add((other_part,symbol))
                         else:
                             working_list.add((one_part,symbol))
-                    
-            print "partition after once split = ", partition
-            print "working_list after once split = ", working_list
-            print "----------------------------------------------"
 
-        # #establish the resulted minimum automata
+        # establish the minimum automata obtained
+        str = ""  # helping variable to join compound state
         new_alphabet = self.alphabet
         new_states = set([])
         new_start = self.start
-        new_final = self.final
-        new_delta = self.delta
+        new_final = self.final.copy()
+        new_delta = self.delta.copy()
         partition_copy = partition.copy()
         new_delta_copy = new_delta.copy()
+
         for tup_of_states in partition_copy:
+            new_state = str.join(tup_of_states)
             if len(tup_of_states) > 1:
-                temp = tup_of_states[0]+"*"
                 if self.start in tup_of_states:
-                    new_start = temp
+                    new_start = new_state
                 if self.final.intersection(set(tup_of_states)) != set([]):
                     new_final.difference_update(set(tup_of_states))
-                    new_final.add(temp)
+                    new_final.add(new_state)
                 for tup in new_delta_copy:
                     if tup[0] in tup_of_states:
                         new_delta.discard(tup)
-                        new_delta.add((temp,tup[1],tup[2]))
-                    if tup[2] in tup_of_states:
+                        if (new_state, tup[1], tup[2]) not in new_delta:
+                            new_delta.add((new_state, tup[1], tup[2]))
+                    elif tup[2] in tup_of_states:
                         new_delta.discard(tup)
-                        new_delta.add((tup[0],tup[1],temp))
-                tup_of_states = (temp,)
-                
-            for state in tup_of_states:
-                new_states.add(state)
+                        if (tup[0], tup[1], new_state) not in new_delta:
+                            new_delta.add((tup[0], tup[1], new_state))
+
+            new_states.add(new_state)
 
         return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
@@ -388,7 +380,6 @@ class Dfa(object):
         for apart in partition:  # apart is tuple, partition is set
             split_state += tuple(x for x in apart if self.delta_function(x,splitter[1]) in splitter[0])
         return split_state
-
     
     def minimize_by_moore(self):
         """
