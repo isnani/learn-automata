@@ -8,11 +8,12 @@ Collection of automata-related algorithms for student, including:
     - NFA
     - NFA-e
     
-2. Convertion
+2. Conversion
     - NFA-e to NFA
     - NFA to DFA
     
 3. Checking properties
+    - Completeness 
     - Universality
     - Emptiness
     - Inclusion

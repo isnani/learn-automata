@@ -83,7 +83,6 @@ class Dfa(object):
         else:
             return 's' 
 
-
     def is_accepted(self, word):
         """
         to check whether a given word is recognized (accepted) by the language or not. Recognized means
@@ -337,7 +336,7 @@ class Dfa(object):
 
         # establish the minimum automata obtained
         str = ""  # helping variable to join compound state
-        new_alphabet = self.alphabet
+        new_alphabet = self.alphabet.copy()
         new_states = set([])
         new_start = self.start
         new_final = self.final.copy()
@@ -380,83 +379,167 @@ class Dfa(object):
         for apart in partition:  # apart is tuple, partition is set
             split_state += tuple(x for x in apart if self.delta_function(x,splitter[1]) in splitter[0])
         return split_state
-    
+
+    def is_complete(self):
+        """
+        check if for every state p and every alphabet a, there is exactly one state q such that (p,a,q)
+        :rtype: bool
+        """
+
+        for symbol in self.alphabet:
+            for state in self.states:
+                if self.delta_function(state, symbol) != 's':
+                    continue
+                return False
+        return True
+
+    def make_it_complete(self):
+        """
+        most minimization algorithms assume automata to be complete. Calling this function to complete automata before
+        it is minimized by any minimization algorithm.
+        :rtype: Dfa
+        """
+
+        new_states = self.states.copy()
+        new_alphabet = self.alphabet.copy()
+        new_start = self.start
+        new_final = self.final.copy()
+        new_delta = self.delta.copy()
+
+        if self.is_complete():
+            return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
+        else:
+            new_states.add('s')
+            for symbol in new_alphabet:
+                for state in new_states:
+                    if self.delta_function(state, symbol) == 's':
+                        new_delta.add((state, symbol, 's'))
+            return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
+
+    # TODO
     def minimize_by_moore(self):
         """
+        first, assume that the dfa is complete
         the idea is using complete graph (states as nodes) as starting step. Then mark all edges between final and
         non-final nodes. As long as there exist marked edges, repeat the following step. Choose (arbitrarily) a marked
         edge (p',q'). Mark all unmarked edges (p,q) where (p.a, q.a) = (p',q') for some a in alphabet.
         :rtype: Dfa
         """
+
+        new_dfa = self.make_it_complete()
         complete_graph = set([])
-        states = self.states.copy()
+        states = new_dfa.states.copy()
         while states != set([]):
             a_state = states.pop()
             for state in states:
                 complete_graph.add((a_state, state))
         print complete_graph
         
-        final = self.final
-        not_final = self.states.difference(self.final)
+        final = new_dfa.final.copy()
+        not_final = new_dfa.states.difference(new_dfa.final)
         marked = set(tup for tup in complete_graph if tup[0] in final and tup[1] in not_final or tup[0] in not_final and
                      tup[1] in final)
         unmarked = complete_graph.difference(marked)
+        print "marked: ", marked
+        print "unmarked: ", unmarked
         unmarked_copy = unmarked.copy()
         while marked != set([]):
             a_marked = marked.pop()
             for tup in unmarked_copy:
-                for symbol in self.alphabet:
-                    if self.delta_function(tup[0], symbol) == a_marked[0] and \
-                                    self.delta_function(tup[1], symbol) == a_marked[1] or \
-                                            self.delta_function(tup[0], symbol) == a_marked[1] and \
-                                            self.delta_function(tup[1], symbol) == a_marked[0]:
+                for symbol in new_dfa.alphabet:
+                    if new_dfa.delta_function(tup[0], symbol) == a_marked[0] and \
+                                    new_dfa.delta_function(tup[1], symbol) == a_marked[1] or \
+                                            new_dfa.delta_function(tup[0], symbol) == a_marked[1] and \
+                                            new_dfa.delta_function(tup[1], symbol) == a_marked[0]:
                         marked.discard(a_marked)
                         marked.add(tup)
                         unmarked.discard(tup)
                         break
 
-        # establish new dfa
-        new_alphabet = self.alphabet
-        new_states = self.states
-        new_delta = self.delta
-        new_start = self.start
-        new_final = self.final
+        print "marked: ", marked
+        print "unmarked: ", unmarked
+        # helping variable
+        str = ""
+
+        # establish new DFA
+        # if any, we return a new DFA without sink state
+        new_dfa.states.discard('s')
+        for delta in new_dfa.delta.copy():
+            if delta[2] == 's':
+                new_dfa.delta.discard(delta)
+
         if unmarked == set([]):
-            return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
+            return Dfa(new_dfa.states, new_dfa.alphabet, new_dfa.delta, new_dfa.start, new_dfa.final)
         else:
-            temp = set([])
+            new_alphabet = new_dfa.alphabet.copy()
+            new_states = set([])
+            new_delta = new_dfa.delta.copy()
+            new_start = new_dfa.start
+            new_final = set([])
+
+            unmarked_states = set([])
             unmarked_copy = unmarked.copy()
-            for tup in unmarked:  # unmarked might contain more than one edges
+
+            # check for states which are marked and which are unmarked
+            for tup in unmarked_copy:
+                unmarked_states.add(tup[0])
+                unmarked_states.add(tup[1])
+
+            marked_states = new_dfa.states.difference(unmarked_states)
+
+            print "mark: ", marked_states
+            print "unmark: ", unmarked_states
+
+            # marked states directly added to new_states
+            new_states = new_states.union(marked_states)
+
+            # may marked states contain a final state
+            for state in marked_states:
+                if state in new_dfa.final:
+                    new_final.add(state)
+
+            # join unmarked states
+            while unmarked_copy != set([]):  # imagine a case: {(1,2), (3,4), (4,5)}
+                tup = unmarked_copy.pop()
+                new_state = str.join(tup)
                 unmarked_copy.discard(tup)
-                for tup2 in unmarked_copy:
-                    if tup2[0] in tup:
-                        if tup2[1] in tup:
-                            temp.add(tup)
-                        else:
-                            temp.add(tup + tup2[1])
-                    else:
-                        if tup2[1] in tup:
-                            temp.add(tup + tup2[0])
-                        else:
-                            temp.add(tup)  # may be true
+                for other_tup in unmarked_copy:
+                    if other_tup[0] in tup:
+                        new_state =+ other_tup[1]
+                        unmarked_copy.discard(other_tup)
+                    elif other_tup[1] in tup:
+                        new_state =+ other_tup[0]
+                        unmarked_copy.discard(other_tup)
 
-            if new_start in temp:
-                new_start =+"*"
-            if new_final.intersection(temp) != set([]):
-                temp2 = new_final.intersection(temp)
-                new_final.difference_update(temp2)
-                new_final_state = temp2.pop()+"*"
-                new_final.add(new_final_state)
-                new_states = new_states.difference(temp2)
-            new_states = new_states.difference(temp)
-            new_states.add(new_start)
-            new_states = new_states.union(new_final)
+                    # check if the start state is also joined with other state
+                    if new_dfa.start in tup or new_dfa.start in other_tup:
+                        new_start = new_state
 
-            # next: new delta
+                # look for final states from unmarked states
+                for state in new_dfa.final:
+
+                    # it's not possible that a non-final state joins with a final state
+                    if state in tup:
+                        new_final.add(new_state)
+
+                unmarked_copy.discard(tup)
+
+                # add the joined state to new_state
+                new_states.add(new_state)
+
+            # remove transitions from states those are joined, and add the new one
+            for state in unmarked_states:
+                for symbol in new_alphabet:
+                    new_delta.discard((state, symbol, new_dfa.delta_function(state, symbol)))
+                    new_delta.add((new_state, symbol, new_dfa.delta_function(state, symbol)))
+
+            # update incoming transition of the new joined states
             new_delta_copy = new_delta.copy()
-            for tup in new_delta_copy:
-                if tup[0] or tup[2] in temp:
-                    pass
+            for delta in new_delta_copy:
+                if delta[2] in unmarked_states:
+                    new_delta.discard(delta)
+                    new_delta.add((delta[0], delta[1], new_state))
+
             return Dfa(new_states, new_alphabet, new_delta, new_start, new_final)
 
     # TODO

@@ -13,8 +13,10 @@ class DfaCase(unittest.TestCase):
     d4 = Dfa({'1', '2', '3', '4', '5'}, {'a', 'b'}, {('1', 'a', '5'), ('1', 'b', '2'), ('2', 'a', '3'), ('2', 'b', '5'),
                                                      ('3', 'a', '3'), ('3', 'b', '4'), ('4', 'a', '3'), ('4', 'b', '5'),
                                                      ('5', 'a', '5'), ('5', 'b', '5')}, '1', {'2', '3', '4'})
-    d1_min = d1.minimize_by_hopcroft()
-    d4_min = d4.minimize_by_hopcroft()
+    d1_min_hop = d1.minimize_by_hopcroft()
+    d4_min_hop = d4.minimize_by_hopcroft()
+    d1_min_moore = d1.minimize_by_moore()
+    d4_min_moore = d4.minimize_by_moore()
 
     def test_is_dfa_d1(self):
         self.assertTrue(self.d1.is_dfa(), True)
@@ -100,21 +102,22 @@ class DfaCase(unittest.TestCase):
         pass
 
     def test_minimize_by_hopcroft_d1(self):
-        self.assertSetEqual(self.d1_min.states, {'1', '2', '3'})
-        self.assertSetEqual(self.d1_min.alphabet, {'a', 'b'})
-        self.assertSetEqual(self.d1_min.delta, {('1', 'a', '2'), ('2', 'b', '3')})
-        self.assertEqual(self.d1_min.start, '1')
-        self.assertSetEqual(self.d1_min.final, {'3'})
+        self.assertSetEqual(self.d1_min_hop.states, {'1', '2', '3'})
+        self.assertSetEqual(self.d1_min_hop.alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d1_min_hop.delta, {('1', 'a', '2'), ('2', 'b', '3')})
+        self.assertEqual(self.d1_min_hop.start, '1')
+        self.assertSetEqual(self.d1_min_hop.final, {'3'})
 
     def test_minimize_by_hopcroft_d4(self):
-        self.assertSetEqual(self.d4_min.states, {'1', '24', '3', '5'})
-        self.assertSetEqual(self.d4_min.alphabet, {'a', 'b'})
-        self.assertSetEqual(self.d4_min.delta, {('1', 'a', '5'), ('1', 'b', '24'), ('24', 'a', '3'), ('24', 'b', '5'),
+        self.assertSetEqual(self.d4_min_hop.states, {'1', '24', '3', '5'})
+        self.assertSetEqual(self.d4_min_hop.alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d4_min_hop.delta, {('1', 'a', '5'), ('1', 'b', '24'), ('24', 'a', '3'), ('24', 'b', '5'),
                                           ('3', 'a', '3'), ('3', 'b', '24'), ('5', 'a', '5'), ('5', 'b', '5')})
-        self.assertEqual(self.d4_min.start, '1')
-        self.assertSetEqual(self.d4_min.final, {'24', '3'})
+        self.assertEqual(self.d4_min_hop.start, '1')
+        self.assertSetEqual(self.d4_min_hop.final, {'24', '3'})
 
-        # why arranging several tests like below resulting different output?
+        # why arranging several tests like below resulting different output? It might because class variable has changed
+        # during instantiation. REVIEW THE CODE!
         #self.assertSetEqual(self.d4.minimize_by_hopcroft().states, {'1', '24', '3', '5'})
         #self.assertSetEqual(self.d4.minimize_by_hopcroft().alphabet, {'a', 'b'})
         #self.assertSetEqual(self.d4.minimize_by_hopcroft().delta, {('1', 'a', '5'), ('1', 'b', '24'), ('24', 'a', '3'),
@@ -124,7 +127,19 @@ class DfaCase(unittest.TestCase):
         #self.assertSetEqual(self.d4.minimize_by_hopcroft().final, {'24', '3'})
 
     def test_minimize_by_moore_d1(self):
-        pass
+        self.assertSetEqual(self.d1_min_moore.states, {'1', '2', '3'})
+        self.assertSetEqual(self.d1_min_moore.alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d1_min_moore.delta, {('1', 'a', '2'), ('2', 'b', '3')})
+        self.assertEqual(self.d1_min_moore.start, '1')
+        self.assertSetEqual(self.d1_min_moore.final, {'3'})
+
+    def test_minimize_by_moore_d4(self):
+        self.assertSetEqual(self.d4_min_moore.states, {'1', '24', '3', '5'})
+        self.assertSetEqual(self.d4_min_moore.alphabet, {'a', 'b'})
+        self.assertSetEqual(self.d4_min_moore.delta, {('1', 'a', '5'), ('1', 'b', '24'), ('24', 'a', '3'), ('24', 'b', '5'),
+                                          ('3', 'a', '3'), ('3', 'b', '24'), ('5', 'a', '5'), ('5', 'b', '5')})
+        self.assertEqual(self.d4_min_moore.start, '1')
+        self.assertSetEqual(self.d4_min_moore.final, {'24', '3'})
 
     def test_minimize_by_brzozowski_d1(self):
         pass
